@@ -1,0 +1,209 @@
+#  (c) 2020 Amazon Web Services, Inc. or its affiliates. All Rights Reserved. This AWS Content is provided subject to the terms of the AWS
+#   Customer Agreement available at https://aws.amazon.com/agreement or other writtenagreement between Customer
+#   and Amazon Web Services, Inc.
+#
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Creates 9 Amazon CloudWatch Alarms that send notification to an Amazon SNS Topic (through Email endpoint)
+
+Parameters:
+  EmailEndpoint:
+    Type: String
+  OpenSearchDomain:
+    Type: String
+    Default: my-test-domain
+
+Resources:
+  SNSTopic:
+    Type: 'AWS::SNS::Topic'
+    Properties:
+      TopicName: "OpenSearchTopic"
+      Subscription:
+        - Endpoint: !Ref EmailEndpoint
+          Protocol: https
+
+  MasterCPUUtilizationAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: MasterCPUUtilization maximum is >= 50% for 15 minutes, 3 consecutive times
+      AlarmName: "MasterCPUUtilizationAlarm"
+      Namespace: 'AWS/ES'
+      MetricName: MasterCPUUtilization
+      Unit: Percent
+      Statistic: Maximum
+      Period: 900
+      EvaluationPeriods: 3
+      Threshold: 50
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: DomainName
+          Value: !Ref OpenSearchDomain
+        - Name: ClientId
+          Value: !Sub "${AWS::AccountId}"
+      AlarmActions:
+        - !Ref SNSTopic
+
+  MasterJVMMemoryPressureAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: MasterJVMMemoryPressure maximum is >= 80% for 15 minutes, 1 consecutive time
+      AlarmName: "MasterJVMMemoryPressureAlarm"
+      Namespace: 'AWS/ES'
+      MetricName: MasterJVMMemoryPressure
+      Unit: Percent
+      Statistic: Maximum
+      Period: 900
+      EvaluationPeriods: 1
+      Threshold: 80
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: DomainName
+          Value: !Ref OpenSearchDomain
+        - Name: ClientId
+          Value: !Sub "${AWS::AccountId}"
+      AlarmActions:
+        - !Ref SNSTopic
+
+  CPUUtilizationAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: CPUUtilization maximum is >= 80% for 15 minutes, 3 consecutive times
+      AlarmName: "CPUUtilizationAlarm"
+      Namespace: 'AWS/ES'
+      MetricName: CPUUtilization
+      Unit: Percent
+      Statistic: Maximum
+      Period: 900
+      EvaluationPeriods: 3
+      Threshold: 80
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: DomainName
+          Value: !Ref OpenSearchDomain
+        - Name: ClientId
+          Value: !Sub "${AWS::AccountId}"
+      AlarmActions:
+        - !Ref SNSTopic
+
+  WarmCPUUtilizationAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: WarmCPUUtilization maximum is >= 80% for 15 minutes, 3 consecutive times
+      AlarmName: "WarmCPUUtilizationAlarm"
+      Namespace: 'AWS/ES'
+      MetricName: WarmCPUUtilization
+      Unit: Percent
+      Statistic: Maximum
+      Period: 900
+      EvaluationPeriods: 3
+      Threshold: 80
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: DomainName
+          Value: !Ref OpenSearchDomain
+        - Name: ClientId
+          Value: !Sub "${AWS::AccountId}"
+      AlarmActions:
+        - !Ref SNSTopic
+
+  JVMMemoryPressureAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: JVMMemoryPressure maximum is >= 80% for 5 minutes, 3 consecutive times
+      AlarmName: "JVMMemoryPressureAlarm"
+      Namespace: 'AWS/ES'
+      MetricName: JVMMemoryPressure
+      Unit: Percent
+      Statistic: Maximum
+      Period: 300
+      EvaluationPeriods: 3
+      Threshold: 80
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: DomainName
+          Value: !Ref OpenSearchDomain
+        - Name: ClientId
+          Value: !Sub "${AWS::AccountId}"
+      AlarmActions:
+        - !Ref SNSTopic
+
+  WarmJVMMemoryPressureAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: WarmJVMMemoryPressure maximum is >= 80% for 5 minutes, 3 consecutive times
+      AlarmName: "WarmJVMMemoryPressureAlarm"
+      Namespace: 'AWS/ES'
+      MetricName: WarmJVMMemoryPressure
+      Unit: Percent
+      Statistic: Maximum
+      Period: 300
+      EvaluationPeriods: 3
+      Threshold: 80
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: DomainName
+          Value: !Ref OpenSearchDomain
+        - Name: ClientId
+          Value: !Sub "${AWS::AccountId}"
+      AlarmActions:
+        - !Ref SNSTopic
+
+  FreeStorageSpaceAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: FreeStorageSpace minimum is <= 20480 for 1 minute, 1 consecutive time
+      AlarmName: "FreeStorageSpaceAlarm"
+      Namespace: 'AWS/ES'
+      MetricName: FreeStorageSpace
+      Unit: Megabytes
+      Statistic: Maximum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 20480
+      ComparisonOperator: LessThanOrEqualToThreshold
+      Dimensions:
+        - Name: DomainName
+          Value: !Ref OpenSearchDomain
+        - Name: ClientId
+          Value: !Sub "${AWS::AccountId}"
+      AlarmActions:
+        - !Ref SNSTopic
+
+  ClusterStatusRedAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: ClusterStatus.red maximum is >= 1 for 1 minute, 1 consecutive time
+      AlarmName: "ClusterStatusRedAlarm"
+      Namespace: 'AWS/ES'
+      MetricName: ClusterStatus.red
+      Statistic: Maximum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: DomainName
+          Value: !Ref OpenSearchDomain
+        - Name: ClientId
+          Value: !Sub "${AWS::AccountId}"
+      AlarmActions:
+        - !Ref SNSTopic
+
+  ClusterStatusYellowAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: ClusterStatus.yellow maximum is >= 1 for 1 minute, 5 consecutive times
+      AlarmName: "ClusterStatusYellowAlarm"
+      Namespace: 'AWS/ES'
+      MetricName: ClusterStatus.yellow
+      Statistic: Maximum
+      Period: 60
+      EvaluationPeriods: 5
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: DomainName
+          Value: !Ref OpenSearchDomain
+        - Name: ClientId
+          Value: !Sub "${AWS::AccountId}"
+      AlarmActions:
+        - !Ref SNSTopic

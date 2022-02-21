@@ -1,0 +1,32 @@
+#  (c) 2020 Amazon Web Services, Inc. or its affiliates. All Rights Reserved. This AWS Content is provided subject to the terms of the AWS
+#   Customer Agreement available at https://aws.amazon.com/agreement or other writtenagreement between Customer
+#   and Amazon Web Services, Inc.
+#
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Creates an Amazon EventBridge rule in order to trigger - once a day - an AWS Lambda function
+
+Resources:
+  ScheduledRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "ScheduledRule"
+      ScheduleExpression: "cron(0 0 * * ? *)"
+      State: "ENABLED"
+      Targets:
+        -
+          Arn:
+            Fn::GetAtt:
+              - "LambdaFunction"
+              - "Arn"
+          Id: "TargetFunction"
+
+  PermissionForEventsToInvokeLambdaFunction:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref "LambdaFunction"
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - "ScheduledRule"
+          - "Arn"

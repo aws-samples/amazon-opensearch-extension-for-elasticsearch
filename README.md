@@ -1,17 +1,8 @@
-## My Project
+# AWS Samples - Building a cost-effective extension to your already existing Elasticsearch cluster thanks to Amazon OpenSearch to enhance your retention policy
 
-TODO: Fill this README out!
-
-Be sure to:
-
-* Change the title in this README
-* Edit your repository description on GitHub
-
-## Security
-
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
-
+### Note:
+This README is meant to supplement the blog post related.
+s
 ## License
 
 This library is licensed under the MIT-0 License. See the LICENSE file.
-

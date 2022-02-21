@@ -2,7 +2,7 @@
 
 ### Note:
 This README is meant to supplement the blog post related.
-s
+
 ## License
 
 This library is licensed under the MIT-0 License. See the LICENSE file.
